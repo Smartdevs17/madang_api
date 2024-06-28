@@ -57,7 +57,7 @@ func (controller *UserController) Register(c *gin.Context) {
 
 	err := controller.UserService.RegisterUser(&user)
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to register user", err.Error())
+		utils.ErrorResponse(c, http.StatusBadRequest, "Failed to register user", err.Error())
 		return
 	}
 
@@ -96,7 +96,7 @@ func (controller *UserController) ValidateEmail(c *gin.Context) {
 
 	err := controller.UserService.VerifyEmailOTP(body.Email, body.Otp)
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to validate email", err.Error())
+		utils.ErrorResponse(c, http.StatusBadRequest, "Failed to validate email", err.Error())
 		return
 	}
 
@@ -122,7 +122,7 @@ func (controller *UserController) Login(c *gin.Context) {
 
 	user, err := controller.UserService.LoginUser(body.Email, body.Password)
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to login user", err.Error())
+		utils.ErrorResponse(c, http.StatusBadRequest, "Failed to login user", err.Error())
 		return
 	}
 
@@ -151,7 +151,7 @@ func (controller *UserController) GetUserByID(c *gin.Context) {
 
 	user, err := controller.UserService.GetUserByID(userID)
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to get user", err.Error())
+		utils.ErrorResponse(c, http.StatusNotFound, "Failed to get user", err.Error())
 		return
 	}
 
@@ -211,6 +211,7 @@ func (controller *UserController) UpdateUser(c *gin.Context) {
 		Avatar      string `json:"avatar"`
 		DeviceId    string `json:"device_id"`
 		DeviceToken string `json:"device_token"`
+		Active      bool   `json:"active"`
 	}
 
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -218,10 +219,10 @@ func (controller *UserController) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	if err := utils.ValidateStruct(c, body); err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Validation error", err.Error())
-		return
-	}
+	// if err := utils.ValidateStruct(c, body); err != nil {
+	// 	utils.ErrorResponse(c, http.StatusBadRequest, "Validation error", err.Error())
+	// 	return
+	// }
 	// Get user from database
 	user, err := controller.UserService.GetUserByID(userID)
 	// Handle error
@@ -235,6 +236,7 @@ func (controller *UserController) UpdateUser(c *gin.Context) {
 	user.Avatar = body.Avatar
 	user.DeviceId = body.DeviceId
 	user.DeviceToken = body.DeviceToken
+	user.Active = body.Active
 
 	// Update user in database
 	err = controller.UserService.UpdateUser(user)
@@ -267,7 +269,7 @@ func (controller *UserController) DeleteUser(c *gin.Context) {
 	}
 	err := controller.UserService.DeleteUser(userID)
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to delete user", err.Error())
+		utils.ErrorResponse(c, http.StatusNotFound, "Failed to delete user", err.Error())
 		return
 	}
 

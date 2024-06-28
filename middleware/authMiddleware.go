@@ -21,14 +21,14 @@ func AuthMiddleware(c *gin.Context) {
 	requestToken := c.GetHeader("Authorization")
 
 	if requestToken == "" {
-		utils.AbortResponse(c, http.StatusUnauthorized, "Unauthorized")
+		utils.AbortResponse(c, http.StatusUnauthorized, "access token required")
 		return
 	}
 
 	tokenString := strings.Split(requestToken, "Bearer ")[1]
 	// fmt.Println(tokenString)
 	if tokenString == "" {
-		utils.AbortResponse(c, http.StatusUnauthorized, "Unauthorized")
+		utils.AbortResponse(c, http.StatusUnauthorized, "access token required")
 		return
 	}
 
@@ -46,7 +46,7 @@ func AuthMiddleware(c *gin.Context) {
 	})
 
 	if err != nil {
-		utils.AbortResponse(c, http.StatusUnauthorized, "Unauthorized")
+		utils.AbortResponse(c, http.StatusUnauthorized, "invalid access token")
 		return
 	}
 

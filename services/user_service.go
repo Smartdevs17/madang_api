@@ -50,6 +50,7 @@ func (s *UserService) VerifyEmailOTP(email string, otp string) error {
 		return errors.New("invalid OTP")
 	}
 	user.EmailVerified = true
+	user.Active = true
 	user.EmailVerificationOTP = ""
 	result = config.DB.Save(&user)
 	if result.Error != nil {
