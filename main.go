@@ -16,12 +16,16 @@ func init() {
 }
 func main() {
 	userService := &services.UserService{}
+	restaurantService := &services.RestaurantService{}
 
 	// Set up Gin router
 	router := gin.Default()
 
 	// Set up user routes
 	routes.SetupUserRoutes(router, userService)
+
+	//Set up restuarant routes
+	routes.SetupRestaurantRoutes(router, restaurantService)
 
 	fmt.Println("Server stated running successfully")
 
