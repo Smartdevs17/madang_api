@@ -25,12 +25,6 @@ type RestaurantControllerInterface interface {
 	GetUserRestaurants(c *gin.Context)
 }
 
-// type RestaurantResponse struct {
-// 	Status  int                    `json:"status"`
-// 	Message string                 `json:"message"`
-// 	Data    []models.Restaurant   `json:"data"`
-// }
-
 // Add a new restaurant
 func (ctrl *RestaurantController) CreateRestaurant(c *gin.Context) {
 	var body struct {

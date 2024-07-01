@@ -6,6 +6,7 @@ type Food struct {
 	Description   string   `json:"description"`
 	Price         float64  `json:"price"`
 	RestaurantID  uint     `json:"restaurant_id"`
+	CategoryId    uint     `json:"category_id"`
 	Ratings       []Rating `json:"ratings" gorm:"foreignKey:FoodID"`
 	AverageRating float64  `json:"average_rating"`
 }

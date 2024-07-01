@@ -17,6 +17,7 @@ func init() {
 func main() {
 	userService := &services.UserService{}
 	restaurantService := &services.RestaurantService{}
+	foodService := &services.FoodService{}
 
 	// Set up Gin router
 	router := gin.Default()
@@ -26,6 +27,9 @@ func main() {
 
 	//Set up restuarant routes
 	routes.SetupRestaurantRoutes(router, restaurantService)
+
+	//Set up food routes
+	routes.SetupFoodRoutes(router, foodService)
 
 	fmt.Println("Server stated running successfully")
 
