@@ -17,7 +17,13 @@ func init() {
 func main() {
 	userService := &services.UserService{}
 	restaurantService := &services.RestaurantService{}
+	categoryService := &services.CategoryService{}
 	foodService := &services.FoodService{}
+	tableService := &services.TableService{}
+	addonService := &services.AddonService{}
+	orderService := &services.OrderService{}
+	paymentService := &services.PaymentService{}
+	transactionService := &services.TransactionService{}
 
 	// Set up Gin router
 	router := gin.Default()
@@ -28,8 +34,26 @@ func main() {
 	//Set up restuarant routes
 	routes.SetupRestaurantRoutes(router, restaurantService)
 
+	//Set up category routes
+	routes.SetupCategoryRoutes(router, categoryService)
+
 	//Set up food routes
 	routes.SetupFoodRoutes(router, foodService)
+
+	//Set up table routes
+	routes.SetupTableRoutes(router, tableService)
+
+	//Set up addon routes
+	routes.SetupAddonRoutes(router, addonService)
+
+	//Set up order routes
+	routes.SetupOrderRoutes(router, orderService)
+
+	//Set up payment routes
+	routes.SetupPaymentRoutes(router, paymentService)
+
+	//Set up transaction routes
+	routes.SetupTransactionRoutes(router, transactionService)
 
 	fmt.Println("Server stated running successfully")
 

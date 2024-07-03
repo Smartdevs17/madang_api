@@ -13,7 +13,7 @@ func SetupRestaurantRoutes(router *gin.Engine, restaurantService *services.Resta
 		RestaurantService: services.RestaurantService{},
 	}
 
-	restaurantRoutes := router.Group("/api/restaurant")
+	restaurantRoutes := router.Group("/api/restaurants")
 	{
 		restaurantRoutes.POST("/", middleware.AuthMiddleware, restaurantController.CreateRestaurant)
 		restaurantRoutes.PUT("/:id", middleware.AuthMiddleware, restaurantController.UpdateRestaurant)

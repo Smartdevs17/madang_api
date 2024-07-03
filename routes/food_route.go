@@ -13,7 +13,7 @@ func SetupFoodRoutes(router *gin.Engine, foodService *services.FoodService) {
 		FoodService: services.FoodService{},
 	}
 
-	foodRoutes := router.Group("/api/food")
+	foodRoutes := router.Group("/api/foods")
 	{
 		foodRoutes.POST("/", middleware.AuthMiddleware, foodController.AddFood)
 		foodRoutes.PUT("/:id", middleware.AuthMiddleware, foodController.UpdateFood)
