@@ -30,6 +30,8 @@ func (ctrl *TableController) AddTable(c *gin.Context) {
 		Name         string  `json:"name"`
 		Number       float64 `json:"number"`
 		Capacity     float64 `json:"capacity"`
+		Image        string  `json:"image"`
+		Price        float64 `json:"price"`
 		RestaurantID uint    `json:"restaurant_id"`
 		CategoryId   uint    `json:"category_id"`
 	}
@@ -48,6 +50,8 @@ func (ctrl *TableController) AddTable(c *gin.Context) {
 	table.Name = body.Name
 	table.Capacity = int(body.Capacity)
 	table.Number = int(body.Number)
+	table.Image = body.Image
+	table.Price = body.Price
 	table.RestaurantID = body.RestaurantID
 	table.CategoryId = body.CategoryId
 
@@ -69,10 +73,13 @@ func (f *TableController) UpdateTable(c *gin.Context) {
 		return
 	}
 	var body struct {
-		Name       string `json:"name"`
-		Number     int    `json:"number"`
-		Capacity   int    `json:"capacity"`
-		CategoryId uint   `json:"category_id"`
+		Name         string  `json:"name"`
+		Number       int     `json:"number"`
+		Capacity     int     `json:"capacity"`
+		Image        string  `json:"image"`
+		Price        float64 `json:"price"`
+		RestaurantID uint    `json:"restaurant_id"`
+		CategoryId   uint    `json:"category_id"`
 	}
 
 	// Validate the request body
@@ -81,16 +88,38 @@ func (f *TableController) UpdateTable(c *gin.Context) {
 		return
 	}
 
-	if err := utils.ValidateStruct(c, body); err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Validation error", err.Error())
-		return
-	}
-
 	// Check if the table item exists
-	_, err := f.TableService.GetTable(tableId)
+	existingTable, err := f.TableService.GetTable(tableId)
 	// Handle error
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusNotFound, "Table not found", err.Error())
+		return
+	}
+	// Update the table fields
+	if body.Name == "" {
+		body.Name = existingTable.Name
+	}
+	if body.Number == 0 {
+		body.Number = existingTable.Number
+	}
+	if body.Capacity == 0 {
+		body.Capacity = existingTable.Capacity
+	}
+	if body.Image == "" {
+		body.Image = existingTable.Image
+	}
+	if body.Price == 0 {
+		body.Price = existingTable.Price
+	}
+	if body.RestaurantID == 0 {
+		body.RestaurantID = existingTable.RestaurantID
+	}
+	if body.CategoryId == 0 {
+		body.CategoryId = existingTable.CategoryId
+	}
+
+	if err := utils.ValidateStruct(c, body); err != nil {
+		utils.ErrorResponse(c, http.StatusBadRequest, "Validation error", err.Error())
 		return
 	}
 
@@ -98,6 +127,9 @@ func (f *TableController) UpdateTable(c *gin.Context) {
 	table.Name = body.Name
 	table.Number = body.Number
 	table.Capacity = body.Capacity
+	table.Image = body.Image
+	table.Price = body.Price
+	table.RestaurantID = body.RestaurantID
 	table.CategoryId = body.CategoryId
 
 	// Call the UpdateTable service
@@ -117,8 +149,15 @@ func (f *TableController) DeleteTable(c *gin.Context) {
 		return
 	}
 
+	_, err := f.TableService.GetTable(tableId)
+	// Handle error
+	if err != nil {
+		utils.ErrorResponse(c, http.StatusNotFound, "Table not found", err.Error())
+		return
+	}
+
 	// Call the DeleteTable service
-	err := f.TableService.DeleteTable(tableId)
+	err = f.TableService.DeleteTable(tableId)
 	// Handle error
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to delete table", err.Error())
@@ -139,7 +178,7 @@ func (f *TableController) GetTable(c *gin.Context) {
 	table, err := f.TableService.GetTable(tableId)
 	// Handle error
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve table", err.Error())
+		utils.ErrorResponse(c, http.StatusNotFound, "Failed to retrieve table", err.Error())
 		return
 	}
 	// Return the table item
@@ -162,7 +201,7 @@ func (f *TableController) GetAllTables(c *gin.Context) {
 
 // GetRestaurantTables retrieves all the tables of a particular restaurant
 func (f *TableController) GetRestaurantTables(c *gin.Context) {
-	restaurantId, valid := utils.ValidateID(c, "restaurant_id")
+	restaurantId, valid := utils.ValidateID(c, "id")
 	if !valid {
 		return
 	}

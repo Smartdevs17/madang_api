@@ -94,6 +94,7 @@ func (ctrl *RestaurantController) UpdateRestaurant(c *gin.Context) {
 		Name      *string `json:"name"`
 		Address   *string `json:"address"`
 		Location  *string `json:"location"`
+		Active    *bool   `json:"active"`
 		Verified  *bool   `json:"verified"`
 		VerfiedAt *string `json:"verified_at"`
 		State     *string `json:"state"`
@@ -123,6 +124,9 @@ func (ctrl *RestaurantController) UpdateRestaurant(c *gin.Context) {
 	}
 	if body.Location != nil {
 		existingRestaurant.Location = *body.Location
+	}
+	if body.Active != nil {
+		existingRestaurant.Active = *body.Active
 	}
 	if body.Verified != nil {
 		existingRestaurant.Verified = *body.Verified

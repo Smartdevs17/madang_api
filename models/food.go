@@ -4,6 +4,7 @@ type Food struct {
 	ID            uint     `json:"id" gorm:"primary_key"`
 	Name          string   `json:"name"`
 	Description   string   `json:"description"`
+	Image         string   `json:"image"`
 	Price         float64  `json:"price"`
 	RestaurantID  uint     `json:"restaurant_id"`
 	CategoryId    uint     `json:"category_id"`

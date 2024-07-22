@@ -12,7 +12,7 @@ import (
 func init() {
 	config.LoadEnvVars()
 	config.ConnectToDB()
-	config.SyncDatabase()
+	// config.SyncDatabase()
 }
 func main() {
 	userService := &services.UserService{}

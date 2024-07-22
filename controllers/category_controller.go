@@ -105,12 +105,31 @@ func (ctrl *CategoryController) UpdateCategory(c *gin.Context) {
 		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid request payload", err.Error())
 		return
 	}
-	//check fig the catergory exists
-	_, err := ctrl.CategoryService.GetCategory(categoryID)
+
+	//fetch existing category and update field if they are provided
+	existingCategory, err := ctrl.CategoryService.GetCategory(categoryID)
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusNotFound, "Category not found", err.Error())
 		return
 	}
+
+	if body.Name == "" {
+		body.Name = existingCategory.Name
+	}
+
+	if body.Type == "" {
+		body.Type = existingCategory.Type
+	}
+
+	if body.RestaurantID == 0 {
+		body.RestaurantID = existingCategory.RestaurantID
+	}
+
+	if err := utils.ValidateStruct(c, body); err != nil {
+		utils.ErrorResponse(c, http.StatusBadRequest, "Validation error", err.Error())
+		return
+	}
+
 	var category models.Category
 	category.ID = categoryID
 	category.Name = body.Name
@@ -158,7 +177,7 @@ func (ctrl *CategoryController) DeleteCategory(c *gin.Context) {
 
 func (ctrl *CategoryController) GetRestaurantCategories(c *gin.Context) {
 	// Get the restaurant ID from the request parameters
-	restaurantID, valid := utils.ValidateID(c, "restaurant_id")
+	restaurantID, valid := utils.ValidateID(c, "id")
 	if !valid {
 		return
 	}

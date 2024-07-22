@@ -73,6 +73,9 @@ func (s *RestaurantService) UpdateRestaurant(restaurant *models.Restaurant) (mod
 	if restaurant.Verified != existingRestaurant.Verified {
 		existingRestaurant.Verified = restaurant.Verified
 	}
+	if restaurant.Active != existingRestaurant.Active {
+		existingRestaurant.Active = restaurant.Active
+	}
 	if restaurant.VerfiedAt != "" {
 		existingRestaurant.VerfiedAt = restaurant.VerfiedAt
 	}

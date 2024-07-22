@@ -29,6 +29,7 @@ func (ctrl *FoodController) AddFood(c *gin.Context) {
 	var body struct {
 		Name         string  `json:"name"`
 		Description  string  `json:"description"`
+		Image        string  `json:"image"`
 		Price        float64 `json:"price"`
 		RestaurantID uint    `json:"restaurant_id"`
 		CategoryId   uint    `json:"category_id"`
@@ -47,6 +48,7 @@ func (ctrl *FoodController) AddFood(c *gin.Context) {
 	var food models.Food
 	food.Name = body.Name
 	food.Description = body.Description
+	food.Image = body.Image
 	food.Price = body.Price
 	food.RestaurantID = body.RestaurantID
 	food.CategoryId = body.CategoryId
@@ -69,10 +71,12 @@ func (f *FoodController) UpdateFood(c *gin.Context) {
 		return
 	}
 	var body struct {
-		Name        string  `json:"name"`
-		Description string  `json:"description"`
-		Price       float64 `json:"price"`
-		CategoryId  uint    `json:"category_id"`
+		Name         string  `json:"name"`
+		Description  string  `json:"description"`
+		Image        string  `json:"image"`
+		Price        float64 `json:"price"`
+		CategoryId   uint    `json:"category_id"`
+		RestaurantId uint    `json:"restaurant_id"`
 	}
 
 	// Validate the request body
@@ -81,24 +85,50 @@ func (f *FoodController) UpdateFood(c *gin.Context) {
 		return
 	}
 
-	if err := utils.ValidateStruct(c, body); err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Validation error", err.Error())
-		return
-	}
-
 	// Check if the food item exists
-	_, err := f.FoodService.GetFood(foodId)
+	existingFood, err := f.FoodService.GetFood(foodId)
 	// Handle error
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusNotFound, "Food not found", err.Error())
 		return
 	}
 
+	if len(body.Name) == 0 {
+		body.Name = existingFood.Name
+	}
+
+	if len(body.Description) == 0 {
+		body.Description = existingFood.Description
+	}
+
+	if len(body.Image) == 0 {
+		body.Image = existingFood.Image
+	}
+
+	if body.Price == 0 {
+		body.Price = existingFood.Price
+	}
+
+	if body.CategoryId == 0 {
+		body.CategoryId = existingFood.CategoryId
+	}
+
+	if body.RestaurantId == 0 {
+		body.RestaurantId = existingFood.RestaurantID
+	}
+
+	if err := utils.ValidateStruct(c, body); err != nil {
+		utils.ErrorResponse(c, http.StatusBadRequest, "Validation error", err.Error())
+		return
+	}
+
 	var food models.Food
 	food.Name = body.Name
 	food.Description = body.Description
+	food.Image = body.Image
 	food.Price = body.Price
 	food.CategoryId = body.CategoryId
+	food.RestaurantID = body.RestaurantId
 
 	// Call the UpdateFood service
 	updatedFood, err := f.FoodService.UpdateFood(&food)
@@ -117,8 +147,15 @@ func (f *FoodController) DeleteFood(c *gin.Context) {
 		return
 	}
 
+	_, err := f.FoodService.GetFood(foodId)
+	// Handle error
+	if err != nil {
+		utils.ErrorResponse(c, http.StatusNotFound, "Food not found", err.Error())
+		return
+	}
+
 	// Call the DeleteFood service
-	err := f.FoodService.DeleteFood(foodId)
+	err = f.FoodService.DeleteFood(foodId)
 	// Handle error
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to delete food", err.Error())
@@ -162,7 +199,7 @@ func (f *FoodController) GetAllFoods(c *gin.Context) {
 
 // GetRestaurantFoods retrieves all the foods of a particular restaurant
 func (f *FoodController) GetRestaurantFoods(c *gin.Context) {
-	restaurantId, valid := utils.ValidateID(c, "restaurant_id")
+	restaurantId, valid := utils.ValidateID(c, "id")
 	if !valid {
 		return
 	}
