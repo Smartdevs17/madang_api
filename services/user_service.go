@@ -40,23 +40,35 @@ func (s *UserService) RegisterUser(user *models.User) error {
 }
 
 // Implement email otp validation
-func (s *UserService) VerifyEmailOTP(email string, otp string) error {
+func (s *UserService) VerifyEmailOTP(email string, otp string) (*models.User, error) {
 	var user models.User
 	result := config.DB.Where("email = ?", email).First(&user)
 	if result.Error != nil {
-		return result.Error
+		return nil, result.Error
 	}
 	if user.EmailVerificationOTP != otp {
-		return errors.New("invalid OTP")
+		return nil, errors.New("invalid OTP")
 	}
+
+	//generate for the user a jwt token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub": user.ID,
+		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
+	})
+
+	// Sign and get the complete encoded token as a string using the secret
+	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+
+	if err != nil {
+		return nil, err
+	}
+	//store the token in the user model
+	user.Token = tokenString
 	user.EmailVerified = true
 	user.Active = true
 	user.EmailVerificationOTP = ""
 	result = config.DB.Save(&user)
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
+	return &user, nil
 }
 
 // LoginUser authenticates a user and returns the user object if successful with token generated and stored in the user model

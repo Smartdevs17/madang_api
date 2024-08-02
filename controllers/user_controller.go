@@ -94,13 +94,26 @@ func (controller *UserController) ValidateEmail(c *gin.Context) {
 		return
 	}
 
-	err := controller.UserService.VerifyEmailOTP(body.Email, body.Otp)
+	user, err := controller.UserService.VerifyEmailOTP(body.Email, body.Otp)
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusBadRequest, "Failed to validate email", err.Error())
 		return
 	}
 
-	utils.SuccessResponse(c, http.StatusOK, "Email validated successfully", nil)
+	loggedInUser := UserResponse{
+		ID:        user.ID,
+		Name:      user.Name,
+		Email:     user.Email,
+		Phone:     user.Phone,
+		Avatar:    user.Avatar,
+		Role:      user.Role,
+		Active:    user.Active,
+		Token:     user.Token,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Email validated successfully", loggedInUser)
 }
 
 // Login User
