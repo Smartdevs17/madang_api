@@ -79,3 +79,12 @@ func (s *TableService) SearchTables(query string) ([]models.Table, error) {
 	}
 	return tables, nil
 }
+
+// get recommended tables for a particular restaurant which is the 5 most recent tables
+func (s *TableService) GetRecommendedTables(restaurantID uint) ([]models.Table, error) {
+	var tables []models.Table
+	if err := config.DB.Where("restaurant_id = ?", restaurantID).Order("id desc").Limit(5).Find(&tables).Error; err != nil {
+		return nil, err
+	}
+	return tables, nil
+}

@@ -55,6 +55,9 @@ func main() {
 	//Set up transaction routes
 	routes.SetupTransactionRoutes(router, transactionService)
 
+	//Set up init routes
+	routes.SetupInitRoutes(router)
+
 	fmt.Println("Server stated running successfully")
 
 	router.Run() // listen and serve on localhost:3000

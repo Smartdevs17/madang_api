@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type User struct {
 	gorm.Model
@@ -19,4 +23,6 @@ type User struct {
 	Restaurants          []Restaurant `json:"restaurants" gorm:"foreignKey:UserID"`
 	Orders               []Order      `json:"orders" gorm:"foreignKey:UserID"`
 	Ratings              []Rating     `json:"ratings" gorm:"foreignKey:UserID"`
+	CreatedAt            time.Time    `json:"created_at"`
+	UpdatedAt            time.Time    `json:"updated_at"`
 }

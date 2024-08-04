@@ -232,3 +232,21 @@ func (f *FoodController) SearchFood(c *gin.Context) {
 	// Return the list of foods
 	utils.SuccessResponse(c, http.StatusOK, "Foods retrieved successfully", foods)
 }
+
+// RecommendedFoods
+func (f *FoodController) RecommendedFoods(c *gin.Context) {
+	restaurantId, valid := utils.ValidateID(c, "id")
+	if !valid {
+		return
+	}
+	// Call the RecommendedFoods service
+	foods, err := f.FoodService.GetRecommendedFoods(restaurantId)
+	// Handle error
+	if err != nil {
+		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve recommended foods", err.Error())
+		return
+	}
+
+	// Return the list of foods
+	utils.SuccessResponse(c, http.StatusOK, "Recommended foods retrieved successfully", foods)
+}

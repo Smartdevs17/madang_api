@@ -234,3 +234,21 @@ func (f *TableController) SearchTable(c *gin.Context) {
 	// Return the list of tables
 	utils.SuccessResponse(c, http.StatusOK, "Tables retrieved successfully", tables)
 }
+
+// RecommendedTables
+func (f *TableController) RecommendedTables(c *gin.Context) {
+	restaurantId, valid := utils.ValidateID(c, "id")
+	if !valid {
+		return
+	}
+	// Call the RecommendedTables service
+	tables, err := f.TableService.GetRecommendedTables(restaurantId)
+	// Handle error
+	if err != nil {
+		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve recommended tables", err.Error())
+		return
+	}
+
+	// Return the list of tables
+	utils.SuccessResponse(c, http.StatusOK, "Recommended tables retrieved successfully", tables)
+}

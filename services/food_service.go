@@ -79,3 +79,12 @@ func (s *FoodService) SearchFoods(query string) ([]models.Food, error) {
 	}
 	return foods, nil
 }
+
+// get recommended foods for a particular restaurant which is the 5 most recent foods
+func (s *FoodService) GetRecommendedFoods(restaurantID uint) ([]models.Food, error) {
+	var foods []models.Food
+	if err := config.DB.Where("restaurant_id = ?", restaurantID).Order("id desc").Limit(5).Find(&foods).Error; err != nil {
+		return nil, err
+	}
+	return foods, nil
+}

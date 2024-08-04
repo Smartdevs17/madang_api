@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Rating struct {
 	gorm.Model
@@ -12,4 +16,6 @@ type Rating struct {
 	User         User       `json:"user"`
 	Food         Food       `json:"food"`
 	Restaurant   Restaurant `json:"restaurant"`
+	CreatedAt    time.Time  `json:"created_at"`
+	UpdatedAt    time.Time  `json:"updated_at"`
 }
