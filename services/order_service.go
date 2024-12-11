@@ -1,6 +1,7 @@
 package services
 
 import (
+	"log"
 	"madang_api/config"
 	"madang_api/models"
 )
@@ -9,11 +10,37 @@ type OrderService struct{}
 
 // Add a new order item return the order or error if it exist and also check if the order exist for that restaurant
 func (s *OrderService) AddOrder(order *models.Order) (*models.Order, error) {
-	//Add the order item
-	if err := config.DB.Create(&order).Error; err != nil {
+	// Begin a transaction
+	tx := config.DB.Begin()
+
+	// Create the order
+	if err := tx.Create(&order).Error; err != nil {
+		tx.Rollback()
+		log.Printf("Error adding order: %v", err)
 		return nil, err
 	}
 
+	// Explicitly save associations
+	if err := tx.Model(&order).Association("FoodOrders").Append(order.FoodOrders); err != nil {
+		tx.Rollback()
+		log.Printf("Error adding food orders: %v", err)
+		return nil, err
+	}
+
+	if err := tx.Model(&order).Association("AddonOrders").Append(order.AddonOrders); err != nil {
+		tx.Rollback()
+		log.Printf("Error adding addon orders: %v", err)
+		return nil, err
+	}
+
+	if err := tx.Preload("FoodOrders.Food").Preload("AddonOrders.Addon").First(&order, order.ID).Error; err != nil {
+		tx.Rollback()
+		log.Printf("Error preloading order details: %v", err)
+		return nil, err
+	}
+
+	// Commit the transaction
+	tx.Commit()
 	return order, nil
 }
 
@@ -40,7 +67,7 @@ func (s *OrderService) DeleteOrder(id uint) error {
 // GetOrder retrieves a order item by its ID and returns the order item or an error if it fails
 func (s *OrderService) GetOrder(id uint) (*models.Order, error) {
 	var order models.Order
-	if err := config.DB.First(&order, id).Error; err != nil {
+	if err := config.DB.Preload("FoodOrders.Food").First(&order, id).Error; err != nil {
 		return nil, err
 	}
 	return &order, nil

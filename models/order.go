@@ -2,14 +2,33 @@ package models
 
 import "time"
 
+type FoodOrder struct {
+	ID       uint `json:"id" gorm:"primary_key"`
+	OrderID  uint `json:"order_id" gorm:"not null"` // Foreign key to Order
+	FoodID   uint `json:"food_id" gorm:"not null"`
+	Food     Food `json:"food" gorm:"foreignKey:FoodID"`
+	Quantity int  `json:"quantity"`
+}
+
+type AddonOrder struct {
+	ID       uint  `json:"id" gorm:"primary_key"`
+	OrderID  uint  `json:"order_id" gorm:"not null"` // Foreign key to Order
+	AddonID  uint  `json:"addon_id" gorm:"not null"` // Foreign key field
+	Addon    Addon `json:"addon"`
+	Quantity int   `json:"quantity"`
+}
+
 type Order struct {
-	ID           uint      `json:"id" gorm:"primary_key"`
-	UserID       uint      `json:"user_id"`
-	RestaurantID uint      `json:"restaurant_id"`
-	TableID      *uint     `json:"table_id,omitempty"` // Nullable, as the order might not include a table
-	Foods        []Food    `json:"foods" gorm:"many2many:order_foods;"`
-	Addons       []Addon   `json:"addons" gorm:"many2many:order_addons;"`
-	TotalPrice   float64   `json:"total_price"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	ID            uint         `json:"id" gorm:"primary_key"`
+	UserID        uint         `json:"user_id"`
+	RestaurantID  uint         `json:"restaurant_id"`
+	TableID       *uint        `json:"table_id,omitempty"`
+	FoodOrders    []FoodOrder  `json:"food_orders" gorm:"foreignKey:OrderID"`
+	AddonOrders   []AddonOrder `json:"addon_orders" gorm:"foreignKey:OrderID"`
+	TotalPrice    float64      `json:"total_price"`
+	Status        string       `json:"status" default:"pending"`
+	SpecialNotes  string       `json:"special_notes,omitempty"`
+	ExpectedReady *time.Time   `json:"expected_ready,omitempty"`
+	CreatedAt     time.Time    `json:"created_at"`
+	UpdatedAt     time.Time    `json:"updated_at"`
 }

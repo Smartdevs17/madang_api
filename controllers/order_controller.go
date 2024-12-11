@@ -30,9 +30,17 @@ func (ctrl *OrderController) AddOrder(c *gin.Context) {
 		UserID       uint `json:"user_id"`
 		TableID      uint `json:"table_id"`
 		RestaurantID uint `json:"restaurant_id"`
-		// Foods        []uint  `json: "foods"`
-		// Addons       []uint  `json: "addons"`
-		TotalPrice float64 `json:"total_price"`
+		Foods        []struct {
+			ID       uint `json:"id"`
+			Quantity int  `json:"quantity"`
+		} `json:"foods"`
+		Addons []struct {
+			ID       uint `json:"id"`
+			Quantity int  `json:"quantity"`
+		} `json:"addons"`
+		TotalPrice   float64 `json:"total_price"`
+		SpecialNotes string  `json:"special_notes"`
+		Status       string  `json:"status"`
 	}
 
 	// Validate the request body
@@ -45,13 +53,37 @@ func (ctrl *OrderController) AddOrder(c *gin.Context) {
 		utils.ErrorResponse(c, http.StatusBadRequest, "Validation error", err.Error())
 		return
 	}
+
 	var order models.Order
 	order.UserID = body.UserID
 	order.TableID = &body.TableID
 	order.RestaurantID = body.RestaurantID
-	// order.Foods = body.Foods
-	// order.Addons = body.Addons
+	order.Status = body.Status
+
+	// Convert body.Foods to []models.FoodOrder
+	var foodOrders []models.FoodOrder
+	for _, food := range body.Foods {
+		foodOrder := models.FoodOrder{
+			FoodID:   food.ID,
+			Quantity: food.Quantity,
+		}
+		foodOrders = append(foodOrders, foodOrder)
+	}
+	order.FoodOrders = foodOrders
+
+	// Convert body.Addons to []models.AddonOrder
+	var addonOrders []models.AddonOrder
+	for _, addon := range body.Addons {
+		addonOrder := models.AddonOrder{
+			Addon:    models.Addon{ID: addon.ID},
+			Quantity: addon.Quantity,
+		}
+		addonOrders = append(addonOrders, addonOrder)
+	}
+	order.AddonOrders = addonOrders
+
 	order.TotalPrice = body.TotalPrice
+	order.SpecialNotes = body.SpecialNotes
 
 	// Call the AddOrder service
 	newOrder, err := ctrl.OrderService.AddOrder(&order)
@@ -61,7 +93,6 @@ func (ctrl *OrderController) AddOrder(c *gin.Context) {
 	}
 
 	utils.SuccessResponse(c, http.StatusCreated, "Order added successfully", newOrder)
-
 }
 
 // UpdateOrder handles the update of an existing order item
@@ -74,9 +105,17 @@ func (f *OrderController) UpdateOrder(c *gin.Context) {
 		UserID       uint `json:"user_id"`
 		TableID      uint `json:"table_id"`
 		RestaurantID uint `json:"restaurant_id"`
-		// Foods        []uint  `json: "foods"`
-		// Addons       []uint  `json: "addons"`
-		TotalPrice float64 `json:"total_price"`
+		Foods        []struct {
+			ID       uint `json:"id"`
+			Quantity int  `json:"quantity"`
+		} `json:"foods"`
+		Addons []struct {
+			ID       uint `json:"id"`
+			Quantity int  `json:"quantity"`
+		} `json:"addons"`
+		TotalPrice   float64 `json:"total_price"`
+		SpecialNotes string  `json:"special_notes"`
+		Status       string  `json:"status"`
 	}
 
 	// Validate the request body
@@ -92,7 +131,6 @@ func (f *OrderController) UpdateOrder(c *gin.Context) {
 
 	// Check if the order item exists
 	_, err := f.OrderService.GetOrder(orderId)
-	// Handle error
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusNotFound, "Order not found", err.Error())
 		return
@@ -102,9 +140,31 @@ func (f *OrderController) UpdateOrder(c *gin.Context) {
 	order.UserID = body.UserID
 	order.TableID = &body.TableID
 	order.RestaurantID = body.RestaurantID
-	// order.Foods = body.Foods
-	// order.Addons = body.Addons
+	order.Status = body.Status
+
+	// Convert body.Foods to []models.FoodOrder
+	var foodOrders []models.FoodOrder
+	for _, food := range body.Foods {
+		foodOrders = append(foodOrders, models.FoodOrder{
+			FoodID:   food.ID,
+			Quantity: food.Quantity,
+		})
+	}
+	order.FoodOrders = foodOrders
+
+	// Convert body.Addons to []models.AddonOrder
+	var addonOrders []models.AddonOrder
+	for _, addon := range body.Addons {
+		addonOrders = append(addonOrders, models.AddonOrder{
+			Addon:    models.Addon{ID: addon.ID},
+			Quantity: addon.Quantity,
+		})
+	}
+	order.AddonOrders = addonOrders
+
 	order.TotalPrice = body.TotalPrice
+	order.SpecialNotes = body.SpecialNotes
+
 	// Call the UpdateOrder service
 	updatedOrder, err := f.OrderService.UpdateOrder(&order)
 	if err != nil {
