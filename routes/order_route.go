@@ -20,7 +20,9 @@ func SetupOrderRoutes(router *gin.Engine, orderService *services.OrderService) {
 		orderRoutes.DELETE("/:id", middleware.AuthMiddleware, orderController.DeleteOrder)
 		orderRoutes.GET("/", middleware.AuthMiddleware, orderController.GetAllOrders)
 		orderRoutes.GET("/search", middleware.AuthMiddleware, orderController.SearchOrder)
-		orderRoutes.GET("/restaurant/:id", middleware.AuthMiddleware, orderController.GetRestaurantOrders)
+		orderRoutes.GET("/status", middleware.AuthMiddleware, orderController.GetOrdersByStatus)
+		orderRoutes.GET("/restaurant/:restaurant_id", middleware.AuthMiddleware, orderController.GetRestaurantOrders)
+		orderRoutes.GET("/user/:user_id", middleware.AuthMiddleware, orderController.GetUserOrders)
 		orderRoutes.GET("/:id", middleware.AuthMiddleware, orderController.GetOrder)
 	}
 }

@@ -18,5 +18,4 @@ func LoadEnvVars() {
 		}
 	}
 	log.Printf("Environment: %s", env)
-	// log.Printf("Sample Env Var: %s", os.Getenv("DB_URL"))
 }

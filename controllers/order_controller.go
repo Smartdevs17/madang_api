@@ -260,3 +260,38 @@ func (f *OrderController) SearchOrder(c *gin.Context) {
 	// Return the list of orders
 	utils.SuccessResponse(c, http.StatusOK, "Orders retrieved successfully", orders)
 }
+
+// GetUserOrders retrieves all the orders of a particular user
+func (f *OrderController) GetUserOrders(c *gin.Context) {
+	userId, valid := utils.ValidateID(c, "user_id")
+	if !valid {
+		return
+	}
+
+	// Call the GetUserOrders service
+	orders, err := f.OrderService.GetUserOrders(userId)
+	// Handle error
+	if err != nil {
+		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve orders", err.Error())
+		return
+	}
+
+	// Return the list of orders
+	utils.SuccessResponse(c, http.StatusOK, "Orders retrieved successfully", orders)
+}
+
+// GetOrdersByStatus retrieves all the orders of a particular status
+func (f *OrderController) GetOrdersByStatus(c *gin.Context) {
+	status := c.Query("status")
+
+	// Call the GetOrdersByStatus service
+	orders, err := f.OrderService.GetOrdersByStatus(status)
+	// Handle error
+	if err != nil {
+		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve orders", err.Error())
+		return
+	}
+
+	// Return the list of orders
+	utils.SuccessResponse(c, http.StatusOK, "Orders retrieved successfully", orders)
+}

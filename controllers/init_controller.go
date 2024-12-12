@@ -14,6 +14,7 @@ type InitController struct {
 	CategoryService services.CategoryService
 	FoodService     services.FoodService
 	TableService    services.TableService
+	OrderService    services.OrderService
 }
 
 // InitController defines the methods for handling initial items been loaded
@@ -41,6 +42,7 @@ func (f *InitController) LoadData(c *gin.Context) {
 		Tables            []models.Table    `json:"tables"`
 		RecommendedFoods  []models.Food     `json:"recommended_foods"`
 		RecommendedTables []models.Table    `json:"recommended_tables"`
+		Orders            []models.Order    `json:"orders"`
 	}
 
 	//Get the User Details
@@ -112,6 +114,14 @@ func (f *InitController) LoadData(c *gin.Context) {
 		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve recommended tables", err.Error())
 	}
 	items.RecommendedTables = recommendedTables
+
+	// Call the Order service
+	orders, err := f.OrderService.GetUserOrders(userId)
+	// Handle error
+	if err != nil {
+		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve orders", err.Error())
+	}
+	items.Orders = orders
 
 	// Return the items
 	utils.SuccessResponse(c, http.StatusOK, "Foods and tables retrieved successfully", items)
