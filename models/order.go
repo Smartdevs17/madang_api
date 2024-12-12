@@ -10,6 +10,13 @@ type FoodOrder struct {
 	Quantity int  `json:"quantity"`
 }
 
+type TableOrder struct {
+	ID      uint  `json:"id" gorm:"primary_key"`
+	OrderID uint  `json:"order_id" gorm:"not null"` // Foreign key to Order
+	TableID uint  `json:"table_id" gorm:"not null"` // Foreign key to Table
+	Table   Table `json:"table" gorm:"foreignKey:TableID"`
+}
+
 type AddonOrder struct {
 	ID       uint  `json:"id" gorm:"primary_key"`
 	OrderID  uint  `json:"order_id" gorm:"not null"` // Foreign key to Order
@@ -24,6 +31,7 @@ type Order struct {
 	RestaurantID  uint         `json:"restaurant_id"`
 	TableID       *uint        `json:"table_id,omitempty"`
 	FoodOrders    []FoodOrder  `json:"food_orders" gorm:"foreignKey:OrderID"`
+	TableOrders   []TableOrder `json:"table_orders" gorm:"foreignKey:OrderID"`
 	AddonOrders   []AddonOrder `json:"addon_orders" gorm:"foreignKey:OrderID"`
 	TotalPrice    float64      `json:"total_price"`
 	Status        string       `json:"status" default:"pending"`

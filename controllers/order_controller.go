@@ -34,6 +34,9 @@ func (ctrl *OrderController) AddOrder(c *gin.Context) {
 			ID       uint `json:"id"`
 			Quantity int  `json:"quantity"`
 		} `json:"foods"`
+		Tables []struct {
+			TableID uint `json:"table_id"`
+		} `json:"tables"`
 		Addons []struct {
 			ID       uint `json:"id"`
 			Quantity int  `json:"quantity"`
@@ -70,6 +73,16 @@ func (ctrl *OrderController) AddOrder(c *gin.Context) {
 		foodOrders = append(foodOrders, foodOrder)
 	}
 	order.FoodOrders = foodOrders
+
+	// Convert body.Tables to []models.TableOrder
+	var tableOrders []models.TableOrder
+	for _, table := range body.Tables {
+		tableOrder := models.TableOrder{
+			TableID: table.TableID,
+		}
+		tableOrders = append(tableOrders, tableOrder)
+	}
+	order.TableOrders = tableOrders
 
 	// Convert body.Addons to []models.AddonOrder
 	var addonOrders []models.AddonOrder
@@ -109,6 +122,9 @@ func (f *OrderController) UpdateOrder(c *gin.Context) {
 			ID       uint `json:"id"`
 			Quantity int  `json:"quantity"`
 		} `json:"foods"`
+		Tables []struct {
+			TableID uint `json:"table_id"`
+		} `json:"tables"`
 		Addons []struct {
 			ID       uint `json:"id"`
 			Quantity int  `json:"quantity"`
@@ -151,6 +167,15 @@ func (f *OrderController) UpdateOrder(c *gin.Context) {
 		})
 	}
 	order.FoodOrders = foodOrders
+
+	// Convert body.TableOrders to []models.TableOrder
+	var tableOrders []models.TableOrder
+	for _, table := range body.Tables {
+		tableOrders = append(tableOrders, models.TableOrder{
+			TableID: table.TableID,
+		})
+	}
+	order.TableOrders = tableOrders
 
 	// Convert body.Addons to []models.AddonOrder
 	var addonOrders []models.AddonOrder
